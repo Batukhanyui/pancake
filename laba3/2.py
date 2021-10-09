@@ -1,45 +1,16 @@
 import pygame
 from pygame.draw import *
 
-pygame.init()
-
-FPS = 30
-screen = pygame.display.set_mode((800, 450))
 #colordefinition
-birds = (66, 33, 11)
-sky = (254, 213, 162)
-sand = (254, 213, 148)
-front = (48, 16, 38)
-midhills = (172, 67, 52)
-backhills = (252, 152, 49)
-sun = (252, 238, 33)
-line3 = (254, 213, 196)
-purple = (179, 134, 148)
-#skylines
-line(screen, sky, (0, 50), (800, 50), 100)
-line(screen, line3, (0, 150), (800, 150), 100)
-line(screen, sand, (0, 250), (800, 250), 100)
-#listsformountains
-dx = [50, 25, 40, 45, 33, 49, 56]
-dy = [28, -45, 27, -40, 30, -42, 10]
-x = [(0, 250)]
-i = 0
-while x[i][0] <= 740:
-    x.append((x[i][0] + dx[i % 7], x[i][1] + dy[i % 7]))
-    i += 1
-x.append((800, 200))
-x.append((800, 450))
-x.append((0, 450))
-da = [30, 80, 100, 65]
-a = [(0, 180)]
-i = 0
-while a[i][0] <= 700:
-    a.append((a[i][0] + da[i % 4], a[i][1] + dy[i % 7]))
-    i += 1
-a.append((800, 160))
-a.append((0, 220))
-a.append(a[0])
-#птыц
+BIRDS = (66, 33, 11)
+SKY = (254, 213, 162)
+SAND = (254, 213, 148)
+FRONTHILLS = (48, 16, 38)
+MIDHILLS = (172, 67, 52)
+BACKHILLS = (252, 152, 49)
+SUN = (252, 238, 33)
+LINE3 = (254, 213, 196)
+PURPLE = (179, 134, 148)
 
 def draw_ellipse_angle(surface, color, rect, angle, width=0):
     target_rect = pygame.Rect(rect)
@@ -55,24 +26,56 @@ def draw_arc_angle(surface, color, rect, angle, width=0):
     rotated_surf = pygame.transform.rotate(shape_surf, angle)
     surface.blit(rotated_surf, rotated_surf.get_rect(center = target_rect.center))
 
-def BIRDS(x, y, alpha=1): #alpha defines the size of the bird
-    draw_ellipse_angle(screen, birds, [x - 12.5*alpha, y, 40*alpha, 10*alpha], -45)
-    draw_ellipse_angle(screen, birds, [x + 12.5*alpha, y - 2*alpha, 43*alpha, 10*alpha], 50)
+def bird(x, y, scale=1, color=BIRDS): 
+    draw_ellipse_angle(screen, color, [x - 12.5*scale, y, 40*scale, 10*scale], -45)
+    draw_ellipse_angle(screen, color, [x + 12.5*scale, y - 2*scale, 43*scale, 10*scale], 50)
 
-listforfronthills=[(0, 200), (100, 230), (250, 370), (300, 420), (500, 440), (550, 380), (600, 400), (650, 300), (800, 248),  (800, 450), (0, 450), (0, 200)]
+def painthills(color, coordinates):
+    polygon(screen, color, coordinates)
 
-polygon(screen, backhills, a)
-polygon(screen, midhills, x)
-polygon(screen, purple, [(0, 300), (800, 250), (800, 450), (0, 450)])
-circle(screen, sun, (400, 100), 40)
-polygon(screen, front, listforfronthills)
+def paintsun(color, coordinates, scale=1):
+    circle(screen, color, coordinates, 40*scale)
 
-BIRDS(100, 100)
-BIRDS(400, 300)
-BIRDS(150, 150)
-BIRDS(600, 200)
-BIRDS(650, 230)
-BIRDS(500, 260, 0.75)
+pygame.init()
+FPS = 30
+screen = pygame.display.set_mode((800, 450))
+
+#poligons
+dmhc0 = [50, 25, 40, 45, 35, 45, 60, 50, 25, 40, 45, 30, 50, 55, 50, 25, 40, 45, 45, 0, -800]
+dmhc1 = [30, -45, 25, -40, 30, -40, 10, 25, -45, 30, -40, 30, -45, 10, 30, -45, 25, -40, 45, 250, 0]
+dbhc0 = [30, 80, 100, 65, 40, 80, 100, 65, 30, 80, 100, 40, -800, 0]
+dbhc1 = [30, -50, 30, -40, 30, -40, 10, 30, -50, 30, -40, 40, 60, -40]
+dfhc0  = [100, 150, 50, 200, 50, 50, 50, 150, 0, -800, 0]
+dfhc1 = [30, 140, 50, 20, -60, 20, -100, -52, 202, 0, -250]
+
+#starts
+midhillCoord = [(0, 250)]
+backhillCoord = [(0, 180)]
+fronthillCoord = [(0, 200)]
+for el in range(21):
+    midhillCoord.append((midhillCoord[el][0] + dmhc0[el], midhillCoord[el][1] + dmhc1[el]))
+for el in range(14):
+    backhillCoord.append((backhillCoord[el][0] + dbhc0[el], backhillCoord[el][1] + dbhc1[el]))
+for el in range(11):
+    fronthillCoord.append((fronthillCoord[el][0] + dfhc0[el], fronthillCoord[el][1] + dfhc1[el]))
+
+#painting
+line(screen, SKY, (0, 50), (800, 50), 100)
+line(screen, LINE3, (0, 150), (800, 150), 100)
+line(screen, SAND, (0, 250), (800, 250), 100)
+
+painthills(BACKHILLS, backhillCoord)
+painthills(MIDHILLS, midhillCoord)
+painthills(PURPLE, [(0, 300), (800, 250), (800, 450), (0, 450)])
+paintsun(SUN, [400, 100])
+painthills(FRONTHILLS, fronthillCoord)
+
+bird(100, 100)
+bird(400, 300)
+bird(150, 150)
+bird(600, 200)
+bird(650, 230)
+bird(500, 260, 0.75)
 
 pygame.display.update()
 clock = pygame.time.Clock()
